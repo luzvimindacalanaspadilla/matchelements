@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grade 9 Elements of Poetry - Matching Game</title>
+<style>
+  :root{
+    --yellow:#FFD83D;
+    --black:#111111;
+    --red:#E53935;
+    --orange:#FF9F43;
+    --green:#55B76B;
+    --light-yellow:#FFF9D6;
+    --light-red:#FFE2E0;
+    --light-orange:#FFEBD5;
+    --light-blue:#E6F4FF;
+    --light-green:#E7F7EA;
+    --white:#FFFFFF;
+  }
+
+  *{box-sizing:border-box}
+
+  body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:linear-gradient(135deg,var(--light-yellow),#fff,var(--light-orange));
+    color:var(--black);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:24px;
+  }
+
+  .game{
+    width:min(1000px,100%);
+    background:rgba(255,255,255,.96);
+    border:4px solid var(--black);
+    border-radius:24px;
+    box-shadow:10px 10px 0 var(--yellow);
+    overflow:hidden;
+  }
+
+  header{
+    background:var(--black);
+    color:var(--white);
+    padding:26px 30px;
+    border-bottom:8px solid var(--red);
+    text-align:center;
+  }
+
+  h1{
+    margin:0 0 8px;
+    font-size:clamp(1.7rem,4vw,2.5rem);
+  }
+
+  .subtitle{
+    margin:0;
+    font-size:1rem;
+    color:#FFF3B0;
+  }
+
+  .instructions{
+    margin:20px auto 0;
+    max-width:760px;
+    background:var(--light-yellow);
+    border:2px solid var(--yellow);
+    border-radius:14px;
+    padding:13px 16px;
+    font-weight:bold;
+    color:var(--black);
+  }
+
+  .content{padding:26px}
+
+  .scoreboard{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:22px;
+  }
+
+  .score{
+    background:var(--yellow);
+    border:3px solid var(--black);
+    border-radius:12px;
+    padding:10px 16px;
+    font-weight:800;
+  }
+
+  .feedback{
+    min-height:44px;
+    flex:1;
+    background:var(--light-blue);
+    border:2px solid #8BC7EA;
+    border-radius:12px;
+    padding:10px 14px;
+    font-weight:bold;
+    text-align:center;
+  }
+
+  .columns{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+  }
+
+  .column-title{
+    margin:0 0 12px;
+    padding:12px;
+    text-align:center;
+    border-radius:12px;
+    border:3px solid var(--black);
+    font-size:1.1rem;
+  }
+
+  .terms-title{background:var(--light-orange)}
+  .definitions-title{background:var(--light-red)}
+
+  .term-list,.drop-list{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  .term{
+    background:var(--yellow);
+    border:3px solid var(--black);
+    border-radius:13px;
+    padding:16px;
+    cursor:grab;
+    font-weight:800;
+    text-align:center;
+    user-select:none;
+    transition:transform .15s, box-shadow .15s, opacity .2s;
+  }
+
+  .term:hover{
+    transform:translateY(-2px);
+    box-shadow:5px 5px 0 var(--red);
+  }
+
+  .term:active{cursor:grabbing}
+  .term.dragging{opacity:.55}
+
+  .drop-zone{
+    min-height:78px;
+    background:var(--white);
+    border:3px dashed var(--red);
+    border-radius:13px;
+    padding:12px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    transition:.2s;
+  }
+
+  .drop-zone.over{
+    background:var(--light-orange);
+    border-color:var(--orange);
+    transform:scale(1.02);
+  }
+
+  .drop-number{
+    min-width:32px;
+    height:32px;
+    border-radius:50%;
+    background:var(--black);
+    color:var(--white);
+    display:grid;
+    place-items:center;
+    font-weight:bold;
+  }
+
+  .definition{
+    font-size:.98rem;
+    line-height:1.35;
+    font-weight:600;
+  }
+
+  .drop-zone.correct{
+    background:var(--light-green);
+    border:3px solid var(--green);
+  }
+
+  .drop-zone.correct .drop-number{
+    background:var(--green);
+  }
+
+  .placed-term{
+    display:block;
+    margin-top:5px;
+    font-size:.88rem;
+    color:#26763A;
+    font-weight:800;
+  }
+
+  .drop-zone.wrong{
+    animation:shake .3s;
+    background:var(--light-red);
+  }
+
+  @keyframes shake{
+    25%{transform:translateX(-5px)}
+    50%{transform:translateX(5px)}
+    75%{transform:translateX(-3px)}
+  }
+
+  .controls{
+    text-align:center;
+    margin-top:26px;
+  }
+
+  button{
+    border:3px solid var(--black);
+    background:var(--red);
+    color:var(--white);
+    font-size:1rem;
+    font-weight:800;
+    padding:13px 24px;
+    border-radius:12px;
+    cursor:pointer;
+    box-shadow:5px 5px 0 var(--black);
+  }
+
+  button:hover{
+    background:var(--orange);
+    color:var(--black);
+  }
+
+  button:active{
+    transform:translate(3px,3px);
+    box-shadow:2px 2px 0 var(--black);
+  }
+
+  .complete{
+    margin-top:18px;
+    background:var(--light-green);
+    border:3px solid var(--green);
+    border-radius:14px;
+    padding:14px;
+    text-align:center;
+    font-weight:800;
+    display:none;
+  }
+
+  @media(max-width:700px){
+    body{padding:10px}
+    .content{padding:18px}
+    .columns{grid-template-columns:1fr}
+    .game{border-radius:16px}
+  }
+</style>
+</head>
+
+<body>
+<main class="game">
+  <header>
+    <h1>🎭 Elements of Poetry Matching Game</h1>
+    <p class="subtitle">Grade 9 English • Drag each term to its correct meaning.</p>
+    <div class="instructions">
+      Drag a term from the <strong>left column</strong> and drop it on the matching definition on the <strong>right column</strong>.
+    </div>
+  </header>
+
+  <section class="content">
+    <div class="scoreboard">
+      <div class="score">Score: <span id="score">0</span> / 5</div>
+      <div class="feedback" id="feedback" aria-live="polite">Start matching the elements of poetry!</div>
+    </div>
+
+    <div class="columns">
+      <section>
+        <h2 class="column-title terms-title">Terms</h2>
+        <div class="term-list" id="termList">
+          <div class="term" draggable="true" data-term="rhyme">Rhyme</div>
+          <div class="term" draggable="true" data-term="rhythm">Rhythm</div>
+          <div class="term" draggable="true" data-term="imagery">Imagery</div>
+          <div class="term" draggable="true" data-term="stanza">Stanza</div>
+          <div class="term" draggable="true" data-term="speaker">Speaker</div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="column-title definitions-title">Meanings</h2>
+        <div class="drop-list">
+          <div class="drop-zone" data-answer="imagery">
+            <span class="drop-number">1</span>
+            <span class="definition">Language that creates vivid pictures or appeals to the senses in the reader's mind.</span>
+          </div>
+
+          <div class="drop-zone" data-answer="rhythm">
+            <span class="drop-number">2</span>
+            <span class="definition">The pattern or flow of stressed and unstressed sounds in a poem.</span>
+          </div>
+
+          <div class="drop-zone" data-answer="speaker">
+            <span class="drop-number">3</span>
+            <span class="definition">The voice or persona that speaks in the poem.</span>
+          </div>
+
+          <div class="drop-zone" data-answer="rhyme">
+            <span class="drop-number">4</span>
+            <span class="definition">The repetition of similar sounds, especially at the ends of lines.</span>
+          </div>
+
+          <div class="drop-zone" data-answer="stanza">
+            <span class="drop-number">5</span>
+            <span class="definition">A group of lines in a poem that forms a unit, similar to a paragraph.</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="complete" id="complete">
+      🎉 Excellent! You matched all 5 elements of poetry correctly!
+    </div>
+
+    <div class="controls">
+      <button id="resetBtn" type="button">↻ Reset Game</button>
+    </div>
+  </section>
+</main>
+
+<script>
+  const terms = document.querySelectorAll(".term");
+  const zones = document.querySelectorAll(".drop-zone");
+  const scoreEl = document.getElementById("score");
+  const feedback = document.getElementById("feedback");
+  const complete = document.getElementById("complete");
+  const termList = document.getElementById("termList");
+  const originalTerms = Array.from(terms);
+
+  let score = 0;
+
+  terms.forEach(term => {
+    term.addEventListener("dragstart", e => {
+      if (term.classList.contains("locked")) {
+        e.preventDefault();
+        return;
+      }
+      e.dataTransfer.setData("text/plain", term.dataset.term);
+      term.classList.add("dragging");
+    });
+
+    term.addEventListener("dragend", () => {
+      term.classList.remove("dragging");
+    });
+  });
+
+  zones.forEach(zone => {
+    zone.addEventListener("dragover", e => {
+      if (!zone.classList.contains("correct")) {
+        e.preventDefault();
+        zone.classList.add("over");
+      }
+    });
+
+    zone.addEventListener("dragleave", () => {
+      zone.classList.remove("over");
+    });
+
+    zone.addEventListener("drop", e => {
+      e.preventDefault();
+      zone.classList.remove("over");
+
+      if (zone.classList.contains("correct")) return;
+
+      const draggedTerm = e.dataTransfer.getData("text/plain");
+      const answer = zone.dataset.answer;
+
+      if (draggedTerm === answer) {
+        const term = document.querySelector(`.term[data-term="${draggedTerm}"]`);
+        zone.classList.add("correct");
+
+        const label = document.createElement("span");
+        label.className = "placed-term";
+        label.textContent = "✓ " + term.textContent + " — Correct!";
+        zone.querySelector(".definition").appendChild(label);
+
+        term.classList.add("locked");
+        term.draggable = false;
+        term.style.opacity = "0.35";
+        term.style.cursor = "default";
+
+        score++;
+        scoreEl.textContent = score;
+        feedback.textContent = "Correct! Great job. Keep going!";
+        feedback.style.background = "var(--light-green)";
+        feedback.style.borderColor = "var(--green)";
+
+        if (score === 5) {
+          complete.style.display = "block";
+          feedback.textContent = "🏆 Perfect score! You know the elements of poetry!";
+        }
+      } else {
+        zone.classList.add("wrong");
+        feedback.textContent = "Not quite. Read the definition again and try another term.";
+        feedback.style.background = "var(--light-red)";
+        feedback.style.borderColor = "var(--red)";
+
+        setTimeout(() => zone.classList.remove("wrong"), 350);
+      }
+    });
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", resetGame);
+
+  function resetGame() {
+    score = 0;
+    scoreEl.textContent = "0";
+    feedback.textContent = "Start matching the elements of poetry!";
+    feedback.style.background = "var(--light-blue)";
+    feedback.style.borderColor = "#8BC7EA";
+    complete.style.display = "none";
+
+    zones.forEach(zone => {
+      zone.classList.remove("correct", "wrong", "over");
+      const placed = zone.querySelector(".placed-term");
+      if (placed) placed.remove();
+    });
+
+    originalTerms.forEach(term => {
+      term.classList.remove("locked", "dragging");
+      term.draggable = true;
+      term.style.opacity = "1";
+      term.style.cursor = "grab";
+      termList.appendChild(term);
+    });
+  }
+</script>
+</body>
+</html>
